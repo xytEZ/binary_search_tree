@@ -1,11 +1,12 @@
 #include <iostream>
+#include <list>
 
 #include "BinarySearchTree.hpp"
 
 template <typename T>
-struct Displayer
+struct NodeKeyDisplayer
 {
-  ~Displayer() { std::cout << std::endl; }
+  ~NodeKeyDisplayer() { std::cout << std::endl; }
 
   void operator()(const typename Tree::BinarySearchTree<T>::Node *node)
   {
@@ -16,12 +17,13 @@ struct Displayer
 int main()
 {
   Tree::BinarySearchTree<int> tree;
-  
+
+  std::cout << "( ( ( ( Insert 16, 93, -35, 62 keys ) ) ) )" << std::endl;
   tree.insert(16);
   tree.insert(93);
   tree.insert(-35);
   tree.insert(62);
-
+  std::cout << std::endl;
 
   // Tree state n°1
 
@@ -29,7 +31,7 @@ int main()
     
   std::cout << "( ( ( ( Depth-first search PREFIX ) ) ) )" << std::endl;
   
-  tree.apply(Displayer<int>());
+  tree.apply(NodeKeyDisplayer<int>());
 
   std::cout << "( ( ( ( tree.operator==(tree) ) ) ) )" << std::endl;
   if (tree == tree)
@@ -59,7 +61,7 @@ int main()
 
   std::cout << "( ( ( ( Depth-first search PREFIX ) ) ) )" << std::endl;
   
-  tree.apply(Displayer<int>());
+  tree.apply(NodeKeyDisplayer<int>());
   
   Tree::BinarySearchTree<int> tree3 = { 42, 17, 69, 95, 62, 10, 99 };
   
@@ -78,21 +80,21 @@ int main()
   
   std::cout << "( ( ( ( Depth-first search PREFIX ) ) ) )" << std::endl;
   
-  tree.apply(Displayer<int>());
+  tree.apply(NodeKeyDisplayer<int>());
   
   std::cout << "( ( ( ( Depth-first search SUFFIX ) ) ) )" << std::endl;
   
-  tree.apply(Displayer<int>(),
+  tree.apply(NodeKeyDisplayer<int>(),
 	     Tree::BinarySearchTree<int>::TraversalType::DFS_SUFFIX);
   
   std::cout << "( ( ( ( Depth-first search INFIX ) ) ) )" << std::endl;
   
-  tree.apply(Displayer<int>(),
+  tree.apply(NodeKeyDisplayer<int>(),
 	     Tree::BinarySearchTree<int>::TraversalType::DFS_INFIX);
 
   std::cout << "( ( ( ( Breadth-first search ) ) ) )" << std::endl;
   
-  tree.apply(Displayer<int>(),
+  tree.apply(NodeKeyDisplayer<int>(),
 	     Tree::BinarySearchTree<int>::TraversalType::BFS);
 
   std::cout << "( ( ( ( Find key = 62 ) ) ) )" << std::endl;
@@ -109,15 +111,29 @@ int main()
     std::cout << "key = -42 is not found" << std::endl;
   std::cout << std::endl;
 
+  std::cout << "( ( ( ( Sorted container ) ) ) )" << std::endl;
+
+  std::list<int> sortedList = tree.toSortedSeqContainer<std::list>();
+
+  std::for_each(sortedList.cbegin(),
+		sortedList.cend(),
+		[](int value) -> void
+		{
+		  std::cout << value << ' ';
+		});
+  std::cout << std::endl << std::endl;
+		  
   /*std::cout << "( ( ( ( Erase 42, 10, 69, -6 keys ) ) ) )" << std::endl; 
   tree.erase(42);
   tree.erase(10);
   tree.erase(69);
   tree.erase(-6);
+  std::cout << std::endl;*/
+  
 
   // Tree state n°4
 
-  std::cout << "[Tree state n°4]" << std::endl << std::endl << std::endl;
+  /*std::cout << "[Tree state n°4]" << std::endl << std::endl << std::endl;
 
   std::cout << "Size : " << tree.size() << std::endl;
   std::cout << "Height : " << tree.height() << std::endl;
@@ -127,7 +143,7 @@ int main()
 
   std::cout << "( ( ( ( Depth-first search PREFIX ) ) ) )" << std::endl;
 
-  tree.apply(Displayer<int>());
+  tree.apply(NodeKeyDisplayer<int>());
 
   std::cout << "( ( ( ( Find key = 42 ) ) ) )" << std::endl;
   if (tree.find(42))
@@ -141,21 +157,21 @@ int main()
     std::cout << "key = 99 is found" << std::endl;
   else
     std::cout << "key = 99 is not found" << std::endl;
-    std::cout << std::endl;*/
-
+    std::cout << std::endl;*/  
+  
   std::cout << "( ( ( ( Clear tree2, tree3 ) ) ) )" << std::endl;
 
   tree2.clear();
   tree3.clear();
 
-  std::cout << "tree2 size, height and width : "
+  std::cout << "tree2 size, height, width : "
 	    << tree2.size()
 	    << ", "
 	    << tree2.height()
 	    << ", "
 	    << tree2.width()
 	    << std::endl;
-  std::cout << "tree3 size, height and width : "
+  std::cout << "tree3 size, height, width : "
 	    << tree3.size()
 	    << ", "
 	    << tree3.height()
@@ -212,9 +228,9 @@ int main()
 
            10      62      95
 
-                             \
+                              \
 
-                              99
+                               99
 
  
  Tree state n°4 :

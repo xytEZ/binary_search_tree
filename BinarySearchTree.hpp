@@ -10,6 +10,8 @@
 # include <deque>
 # include <algorithm>
 # include <initializer_list>
+# include <list>
+# include <vector>
 
 namespace Tree
 {
@@ -21,12 +23,13 @@ namespace Tree
     {
     private :
       T _value;
+      Node *_parent;
       Node *_left;
       Node *_right;
       
     public :
-      Node(const T&, Node * = nullptr, Node * = nullptr);
-      Node(T&&, Node * = nullptr, Node * = nullptr);
+      Node(const T&, Node * = nullptr, Node * = nullptr, Node * = nullptr);
+      Node(T&&, Node * = nullptr, Node * = nullptr, Node * = nullptr);
       Node(const Node&) = default;
       ~Node() = default;
       Node& operator=(const Node&) = default;
@@ -34,6 +37,9 @@ namespace Tree
       T& getValue();
       void setValue(const T&);
       void setValue(T&&);
+      const Node *getParent() const;
+      Node *getParent();
+      void setParent(Node *);
       const Node *getLeft() const;
       Node *getLeft();
       void setLeft(Node *);
@@ -71,8 +77,12 @@ namespace Tree
     Node *erase(const T&);
     void apply(const FunctorNode&,
 	       TraversalType = TraversalType::DFS_PREFIX) const;
+    
+    template <template <class, class = std::allocator<T>> class U>
+      U<T> toSortedSeqContainer() const;
+    
     void clear();
-
+    
   private :
     void copyTree(const Node *);
     void copyTree(Node *, const Node *);
@@ -82,23 +92,33 @@ namespace Tree
     void applyDFSSuffix(const FunctorNode&, const Node *) const;
     void applyDFSInfix(const FunctorNode&, const Node *) const;
     void applyBFS(const FunctorNode&) const;
+
+    template <template <class, class = std::allocator<T>> class U>
+      void toSortedSeqContainer(U<T>&, const Node *) const;
+    
+    void initSortedSeqContainer(std::vector<T>&) const;
+    void initSortedSeqContainer(std::list<T>&) const;    
     void eraseAll(Node *);
   };
 
   template <typename T>
   BinarySearchTree<T>::Node::Node(const T& value,
+				  Node *parent,
 				  Node *left,
 				  Node *right) :
     _value(value),
+    _parent(parent),
     _left(left),
     _right(right)
   { }
 
   template <typename T>
   BinarySearchTree<T>::Node::Node(T&& value,
+				  Node *parent,
 				  Node *left,
 				  Node *right) :
     _value(std::move(value)),
+    _parent(parent),
     _left(left),
     _right(right)
   { }
@@ -119,6 +139,17 @@ namespace Tree
   {
     this->_value = std::move(value);
   }
+
+  template <typename T>
+  const typename BinarySearchTree<T>::Node *
+  BinarySearchTree<T>::Node::getParent() const { return _parent; }
+
+  template <typename T>
+  typename BinarySearchTree<T>::Node *
+  BinarySearchTree<T>::Node::getParent() { return _parent; }
+
+  template <typename T>
+  void BinarySearchTree<T>::Node::setParent(Node *parent) { _parent = parent; }
   
   template <typename T>
   const typename BinarySearchTree<T>::Node *
@@ -129,7 +160,7 @@ namespace Tree
   BinarySearchTree<T>::Node::getLeft() { return _left; }
 
   template <typename T>
-  void BinarySearchTree<T>::Node::setLeft(Node *left) { this->_left = left; }
+  void BinarySearchTree<T>::Node::setLeft(Node *left) { _left = left; }
 
   template <typename T>
   const typename BinarySearchTree<T>::Node *
@@ -141,7 +172,7 @@ namespace Tree
 
   template <typename T>
   void
-  BinarySearchTree<T>::Node::setRight(Node *right) { this->_right = right; }
+  BinarySearchTree<T>::Node::setRight(Node *right) { _right = right; }
 
   
   template <typename T>
@@ -332,13 +363,24 @@ namespace Tree
   }
 
   template <typename T>
+  template <template <class, class = std::allocator<T>> class U>
+    U<T> BinarySearchTree<T>::toSortedSeqContainer() const
+  {
+    U<T> sortedSeqContainer;
+
+    initSortedSeqContainer(sortedSeqContainer);
+    toSortedSeqContainer(sortedSeqContainer, _root);
+    return sortedSeqContainer;
+  }
+
+  template <typename T>
   void BinarySearchTree<T>::clear()
   {
     eraseAll(_root);
     _root = nullptr;
     _size = 0;
   }
-
+  
   template <typename T>
   void BinarySearchTree<T>::copyTree(const Node *src)
   {
@@ -437,6 +479,30 @@ namespace Tree
 	  nodes.push(node->getRight());
       }
   }
+  
+  template <typename T>
+  template <template <class, class = std::allocator<T>> class U>
+    void BinarySearchTree<T>::toSortedSeqContainer(U<T>& sortedSeqContainer,
+						   const Node *node) const
+  {
+    if (node)
+      {
+	toSortedSeqContainer(sortedSeqContainer, node->getLeft());
+	sortedSeqContainer.push_back(node->getValue());
+	toSortedSeqContainer(sortedSeqContainer, node->getRight());
+      }
+  }
+
+  template <typename T>
+  inline void
+  BinarySearchTree<T>::initSortedSeqContainer(std::vector<T>& vector) const
+  {
+    vector.resize(_size);
+  }
+
+  template <typename T>
+  inline void
+  BinarySearchTree<T>::initSortedSeqContainer(std::list<T>&) const { }
   
   template <typename T>
   void BinarySearchTree<T>::eraseAll(Node *node)
