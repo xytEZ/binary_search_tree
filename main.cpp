@@ -17,9 +17,12 @@ struct NodeKeyDisplayer
 int main()
 {
   Tree::BinarySearchTree<int> tree;
+  int value1 = 16;
+  int value2 = 93;
 
   std::cout << "( ( ( ( Insert 16, 93, -35, 62 keys ) ) ) )" << std::endl;
-  tree.insert(16);
+  tree.insert(value1);
+  tree.insert(value2);
   tree.insert(93);
   tree.insert(-35);
   tree.insert(62);
@@ -111,7 +114,7 @@ int main()
     std::cout << "key = -42 is not found" << std::endl;
   std::cout << std::endl;
 
-  std::cout << "( ( ( ( Sorted container ) ) ) )" << std::endl;
+  std::cout << "( ( ( ( Sorted sequence container ) ) ) )" << std::endl;
 
   std::list<int> sortedList = tree.toSortedSeqContainer<std::list>();
 
@@ -123,11 +126,14 @@ int main()
 		});
   std::cout << std::endl << std::endl;
 		  
-  /*std::cout << "( ( ( ( Erase 42, 10, 69, -6 keys ) ) ) )" << std::endl; 
+  /*std::cout << "( ( ( ( Erase 42, 95, 95, 69, -6, 62 keys ) ) ) )" 
+    << std::endl;
   tree.erase(42);
-  tree.erase(10);
+  tree.erase(95);
+  tree.erase(95);
   tree.erase(69);
   tree.erase(-6);
+  tree.erase(62);
   std::cout << std::endl;*/
   
 
@@ -157,7 +163,7 @@ int main()
     std::cout << "key = 99 is found" << std::endl;
   else
     std::cout << "key = 99 is not found" << std::endl;
-    std::cout << std::endl;*/  
+    std::cout << std::endl;*/
   
   std::cout << "( ( ( ( Clear tree2, tree3 ) ) ) )" << std::endl;
 
@@ -232,8 +238,16 @@ int main()
 
                                99
 
+
  
  Tree state n°4 :
 
+
+                   17
+                
+                 /    \
+                
+	       10      62
+               
+
 */
-                    
