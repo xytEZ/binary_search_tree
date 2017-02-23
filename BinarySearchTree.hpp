@@ -13,8 +13,6 @@
 # include <list>
 # include <vector>
 
-# include <iostream>
-
 namespace Tree
 {
   template <typename T>
@@ -72,7 +70,7 @@ namespace Tree
     void insert(const T&);
     void insert(T&&);
     Node *find(const T&) const;
-    bool erase(const T&);
+    void erase(const T&);
     void clear();
     void apply(const FunctorNode&,
 	       TraversalType = TraversalType::DFS_PREFIX) const;
@@ -85,11 +83,12 @@ namespace Tree
     void copyTree(Node *, const Node *);
     bool compareTree(const Node *, const Node *) const;
     std::size_t height(const Node *) const;
-    void findPredecessor(Node *, Node*&, Node*&);
-    void replaceByPredecessor(Node *);
-    bool erase(Node *, Node *, const T&);
-    bool eraseNode(Node *, Node *);
-    bool eraseLeaf(Node *, Node *);    
+    void insert(Node *, const T&);
+    void insert(Node *, T&&);
+    Node *find(Node *, const T&) const;
+    Node *erase(Node *, const T&);
+    Node *erase(Node *);
+    Node *findMax(Node *);
     void eraseAll(Node *);
     void applyDFSPrefix(const FunctorNode&, const Node *) const;
     void applyDFSSuffix(const FunctorNode&, const Node *) const;
@@ -249,96 +248,49 @@ namespace Tree
   
   template <typename T>
   void BinarySearchTree<T>::insert(const T& value)
-  {
+  {    
     if (_root)
-      {
-	Node *current = _root;
-
-	while (current)
-	  {
-	    Node *parent = current;
-
-	    if (current->getValue() == value)
-	      return;
-	    else if (current->getValue() > value)
-	      {
-		current = current->getLeft();
-		if (!current)
-		  parent->setLeft(new Node(value));
-	      }
-	    else
-	      {
-		current = current->getRight();
-		if (!current)
-		  parent->setRight(new Node(value));
-	      }
-	  }
-      }
+      insert(_root, value);
     else
-      _root = new Node(value);
-    ++_size;
+      {
+	_root = new Node(value);
+	++_size;
+      }
   }
 
   template <typename T>
   void BinarySearchTree<T>::insert(T&& value)
   {
     if (_root)
-      {
-	Node *current = _root;
-    
-	while (current)
-	  {
-	    Node *parent = current;
-
-	    if (current->getValue() == value)
-	      return;
-	    else if (current->getValue() > value)
-	      {
-		current = current->getLeft();
-		if (!current)
-		  parent->setLeft(new Node(std::forward<T>(value)));
-	      }
-	    else
-	      {
-		current = current->getRight();
-		if (!current)
-		  parent->setRight(new Node(std::forward<T>(value)));
-	      }
-	  }
-      }
+      insert(_root, std::forward<T>(value));
     else
-      _root = new Node(std::forward<T>(value));
-    ++_size;
-  }
-  
-  template <typename T>
-  bool BinarySearchTree<T>::erase(const T& value)
-  {
-    if (erase(_root, nullptr, value))
       {
-	--_size;
-	if (_size == 0)
-	  _root = nullptr;
-	return true;
+	_root = new Node(std::forward<T>(value));
+	++_size;
       }
-    else
-      return false;
   }
   
   template <typename T>
   typename BinarySearchTree<T>::Node *
   BinarySearchTree<T>::find(const T& value) const
   {
-    Node *current = _root;
+    return find(_root, value);
+  }
+  
+  template <typename T>
+  void BinarySearchTree<T>::erase(const T& value)
+  {
+    erase(_root, value);
+    if (_size == 0)
+      _root = nullptr;
+  }
 
-    while (current)
-      {
-	if (current->getValue() == value)
-	  return current;
-	current = (current->getValue() > value) ?
-	  current->getLeft() : current->getRight();
-      }
-    return nullptr;
+  template <typename T>
+  void BinarySearchTree<T>::clear()
+  {
+    eraseAll(_root);
+    _root = nullptr;
+    _size = 0;
   }
   
   template <typename T>
@@ -363,18 +315,10 @@ namespace Tree
     U<T> BinarySearchTree<T>::toSortedSeqContainer() const
   {
     U<T> sortedSeqContainer;
-
+    
     initSortedSeqContainer(sortedSeqContainer);
     toSortedSeqContainer(sortedSeqContainer, _root);
     return sortedSeqContainer;
-  }
-
-  template <typename T>
-  void BinarySearchTree<T>::clear()
-  {
-    eraseAll(_root);
-    _root = nullptr;
-    _size = 0;
   }
   
   template <typename T>
@@ -408,10 +352,8 @@ namespace Tree
     if (lhs && rhs && lhs->getValue() == rhs->getValue())
       return !(compareTree(lhs->getLeft(), rhs->getLeft())
 	       ^ compareTree(lhs->getRight(), rhs->getRight()));
-    else if (!lhs && !rhs)
-      return true;
     else
-      return false;
+      return !lhs && !rhs;
   }
   
   template <typename T>
@@ -422,84 +364,110 @@ namespace Tree
   }
 
   template <typename T>
-  void BinarySearchTree<T>::findPredecessor(Node *current,
-					    Node*& predecessor,
-					    Node*& parent)
+  void BinarySearchTree<T>::insert(Node *current, const T& value)
   {
-    parent = current;
-    current = current->getLeft();    
-    while (current && current->getRight())
+    if (current->getValue() > value)
       {
-	parent = current;
-	current = (current->getRight()) ?
-	  current->getRight() : current->getLeft();
+	if (current->getLeft())
+	  return insert(current->getLeft(), value);
+	else
+	  current->setLeft(new Node(value));
       }
-    predecessor = current;
+    else if (current->getValue() < value)
+      {
+	if (current->getRight())
+	  return insert(current->getRight(), value);
+	else
+	  current->setRight(new Node(value));
+      }
+    else
+      return;
+    ++_size;
   }
 
   template <typename T>
-  void BinarySearchTree<T>::replaceByPredecessor(Node *current)
+  void BinarySearchTree<T>::insert(Node *current, T&& value)
   {
-    Node *parent = nullptr;
-    Node *predecessor = nullptr;
-
-    findPredecessor(current, predecessor, parent);
-    std::swap(current->getValue(), predecessor->getValue());
-    eraseLeaf(predecessor, parent);
+    if (current->getValue() > value)
+      {
+	if (current->getLeft())
+	  return insert(current->getLeft(), std::forward<T>(value));
+	else
+	  current->setLeft(new Node(std::forward<T>(value)));
+      }
+    else if (current->getValue() < value)
+      {
+	if (current->getRight())
+	  return insert(current->getRight(), std::forward<T>(value));
+	else
+	  current->setRight(new Node(std::forward<T>(value)));
+      }
+    else
+      return;
+    ++_size;
   }
 
   template <typename T>
-  bool BinarySearchTree<T>::erase(Node *current,
-				  Node *parent,
-				  const T& value)
+  typename BinarySearchTree<T>::Node *
+  BinarySearchTree<T>::find(Node *current, const T& value) const
   {
     if (!current)
-      return false;
-    else if (current
-	&& current->getValue() == value
-	&& (current->getLeft() || current->getRight()))
-      return eraseNode(current, parent);
-    else if (current
-	     && current->getValue() == value
-	     && !current->getLeft()
-	     && !current->getRight())
-      return eraseLeaf(current, parent);
+      return nullptr;
+    else if (current->getValue() > value)
+      return find(current->getLeft(), value);
+    else if (current->getValue() < value)
+      return find(current->getRight(), value);
     else
-      return erase(current->getLeft(), current, value)
-	|| erase(current->getRight(), current, value);
+      return current;
   }
 
   template <typename T>
-  bool BinarySearchTree<T>::eraseNode(Node *current, Node *parent)
+  typename BinarySearchTree<T>::Node *
+  BinarySearchTree<T>::erase(Node *current, const T& value)
   {
-    if (current->getLeft() && current->getRight())
-      replaceByPredecessor(current);
+    if (!current)
+      return nullptr;
+    else if (current->getValue() > value)
+      current->setLeft(erase(current->getLeft(), value));
+    else if (current->getValue() < value)
+      current->setRight(erase(current->getRight(), value));
     else
-      {
-	if (!parent && current->getLeft())
-	  _root = current->getLeft();
-	else if (!parent && current->getRight())
-	  _root = current->getRight();
-	else if (parent && parent->getLeft() == current)
-	  parent->getLeft()->setLeft(current->getLeft());
-	else if (parent && parent->getRight() == current)
-	  parent->getRight()->setRight(current->getRight());
-	delete current;
-      }
-    return true;
+      return erase(current);
+    return current;
   }
   
   template <typename T>
-  bool BinarySearchTree<T>::eraseLeaf(Node *current, Node *parent)
+  typename BinarySearchTree<T>::Node *
+  BinarySearchTree<T>::erase(Node *current)
   {
-    if (parent && parent->getLeft() == current)
-      parent->getLeft()->setLeft(nullptr);
-    else if (parent && parent->getRight() == current)
-      parent->getRight()->setRight(nullptr);
+    Node *tmp;
+    
+    if (!current->getLeft() && !current->getRight())
+      tmp = nullptr;
+    else if (!current->getRight())
+      tmp = current->getLeft();
+    else if (!current->getLeft())
+      tmp = current->getRight();
+    else
+      {
+	tmp = findMax(current->getLeft());
+	std::swap(current->getValue(), tmp->getValue());
+	current->setLeft(erase(current->getLeft(), tmp->getValue()));
+	return current;
+      }
+    --_size;
     delete current;
-    return true;
+    return tmp;
   }
-  
+
+  template <typename T>
+  typename BinarySearchTree<T>::Node *
+  BinarySearchTree<T>::findMax(Node *current)
+  {
+    return (current->getRight()) ?
+      findMax(current->getRight()) : current;
+  }
+
   template <typename T>
   void BinarySearchTree<T>::eraseAll(Node *node)
   {

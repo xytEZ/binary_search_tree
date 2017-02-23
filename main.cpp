@@ -20,17 +20,17 @@ int main()
   int value1 = 16;
   int value2 = 93;
 
-  std::cout << "( ( ( ( Insert 16, 93, -35, 62 keys ) ) ) )" << std::endl;
+  std::cout << "( ( ( ( Insert 16, 93, 93, -35, 62 keys ) ) ) )" << std::endl;
   tree.insert(value1);
   tree.insert(value2);
   tree.insert(93);
   tree.insert(-35);
   tree.insert(62);
-  std::cout << std::endl;
+  std::cout << std::endl << std::endl;
 
   // Tree state n°1
 
-  std::cout << "[Tree state n°1]" << std::endl << std::endl << std::endl;
+  std::cout << "[Tree state n°1]" << std::endl << std::endl;
     
   std::cout << "( ( ( ( Depth-first search PREFIX ) ) ) )" << std::endl;
   
@@ -53,14 +53,15 @@ int main()
     std::cout << "tree is equal to tree2" << std::endl;
   else
     std::cout << "tree is not equal to tree2" << std::endl;
-  std::cout << std::endl;
+  std::cout << std::endl << std::endl;
   
   tree = tree2;
+  
 
   
   // Tree state n°2
 
-  std::cout << "[Tree state n°2]" << std::endl << std::endl << std::endl;
+  std::cout << "[Tree state n°2]" << std::endl << std::endl;
 
   std::cout << "( ( ( ( Depth-first search PREFIX ) ) ) )" << std::endl;
   
@@ -70,10 +71,13 @@ int main()
   
   tree = tree3;
 
+  std::cout << std::endl;
+
+  
   
   // Tree state n°3
   
-  std::cout << "[Tree state n°3]" << std::endl << std::endl << std::endl;
+  std::cout << "[Tree state n°3]" << std::endl << std::endl;
 
   std::cout << "Size : " << tree.size() << std::endl;
   std::cout << "Height : " << tree.height() << std::endl;
@@ -126,7 +130,7 @@ int main()
 		});
   std::cout << std::endl << std::endl;
 		  
-  /*std::cout << "( ( ( ( Erase 42, 95, 95, 69, -6, 62 keys ) ) ) )" 
+  std::cout << "( ( ( ( Erase 42, 95, 95, 69, -6, 62 keys ) ) ) )" 
     << std::endl;
   tree.erase(42);
   tree.erase(95);
@@ -134,12 +138,13 @@ int main()
   tree.erase(69);
   tree.erase(-6);
   tree.erase(62);
-  std::cout << std::endl;*/
+  std::cout << std::endl << std::endl;
+  
   
 
   // Tree state n°4
 
-  /*std::cout << "[Tree state n°4]" << std::endl << std::endl << std::endl;
+  std::cout << "[Tree state n°4]" << std::endl << std::endl;
 
   std::cout << "Size : " << tree.size() << std::endl;
   std::cout << "Height : " << tree.height() << std::endl;
@@ -163,7 +168,7 @@ int main()
     std::cout << "key = 99 is found" << std::endl;
   else
     std::cout << "key = 99 is not found" << std::endl;
-    std::cout << std::endl;*/
+    std::cout << std::endl;
   
   std::cout << "( ( ( ( Clear tree2, tree3 ) ) ) )" << std::endl;
 
@@ -242,12 +247,11 @@ int main()
  
  Tree state n°4 :
 
-
                    17
                 
                  /    \
                 
-	       10      62
+	       10      99
                
 
 */
