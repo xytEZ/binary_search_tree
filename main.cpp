@@ -28,6 +28,8 @@ int main()
   tree.insert(62);
   std::cout << std::endl << std::endl;
 
+
+  
   // Tree state n°1
 
   std::cout << "[Tree state n°1]" << std::endl << std::endl;
@@ -56,9 +58,9 @@ int main()
   std::cout << std::endl << std::endl;
   
   tree = tree2;
-  
 
   
+
   // Tree state n°2
 
   std::cout << "[Tree state n°2]" << std::endl << std::endl;

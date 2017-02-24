@@ -53,7 +53,7 @@ namespace Tree
   public :
     using FunctorNode = std::function<void (const Node *)>;
   
-  private :
+  protected :
     Node *_root;
     std::size_t _size;
     
@@ -61,16 +61,16 @@ namespace Tree
     BinarySearchTree();
     BinarySearchTree(const BinarySearchTree&);
     BinarySearchTree(const std::initializer_list<T>&);
-    ~BinarySearchTree();
-    BinarySearchTree& operator=(const BinarySearchTree&);
+    virtual ~BinarySearchTree();
+    virtual BinarySearchTree& operator=(const BinarySearchTree&);
     bool operator==(const BinarySearchTree&) const;
     std::size_t size() const;
     std::size_t height() const;
     std::size_t width() const;
-    void insert(const T&);
-    void insert(T&&);
+    virtual void insert(const T&);
+    virtual void insert(T&&);
     Node *find(const T&) const;
-    void erase(const T&);
+    virtual void erase(const T&);
     void clear();
     void apply(const FunctorNode&,
 	       TraversalType = TraversalType::DFS_PREFIX) const;
@@ -88,7 +88,7 @@ namespace Tree
     Node *find(Node *, const T&) const;
     Node *erase(Node *, const T&);
     Node *erase(Node *);
-    Node *findMax(Node *);
+    Node *findMax(Node *) const;
     void eraseAll(Node *);
     void applyDFSPrefix(const FunctorNode&, const Node *) const;
     void applyDFSSuffix(const FunctorNode&, const Node *) const;
@@ -462,7 +462,7 @@ namespace Tree
 
   template <typename T>
   typename BinarySearchTree<T>::Node *
-  BinarySearchTree<T>::findMax(Node *current)
+  BinarySearchTree<T>::findMax(Node *current) const
   {
     return (current->getRight()) ?
       findMax(current->getRight()) : current;
