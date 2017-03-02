@@ -82,7 +82,11 @@ namespace Tree
     void copyTree(const Node *);
     void copyTree(Node *, const Node *);
     bool compareTree(const Node *, const Node *) const;
+
+  protected :
     std::size_t height(const Node *) const;
+
+  private :
     void insert(Node *, const T&);
     void insert(Node *, T&&);
     Node *find(Node *, const T&) const;
@@ -498,8 +502,8 @@ namespace Tree
     if (node)
       {
 	applyDFSSuffix(functor, node->getLeft());
-	functor(node);
 	applyDFSSuffix(functor, node->getRight());
+	functor(node);
       }
   }
 
@@ -510,8 +514,8 @@ namespace Tree
     if (node)
       {
 	applyDFSInfix(functor, node->getLeft());
-	applyDFSInfix(functor, node->getRight());
 	functor(node);
+	applyDFSInfix(functor, node->getRight());
       }
   }
 
