@@ -53,7 +53,7 @@ namespace Tree
   public :
     using FunctorNode = std::function<void (const Node *)>;
   
-  protected :
+  private :
     Node *_root;
     std::size_t _size;
     
@@ -62,15 +62,15 @@ namespace Tree
     BinarySearchTree(const BinarySearchTree&);
     BinarySearchTree(const std::initializer_list<T>&);
     virtual ~BinarySearchTree();
-    virtual BinarySearchTree& operator=(const BinarySearchTree&);
+    BinarySearchTree& operator=(const BinarySearchTree&);
     bool operator==(const BinarySearchTree&) const;
     std::size_t size() const;
     std::size_t height() const;
     std::size_t width() const;
-    virtual void insert(const T&);
-    virtual void insert(T&&);
+    void insert(const T&);
+    void insert(T&&);
     Node *find(const T&) const;
-    virtual void erase(const T&);
+    void erase(const T&);
     void clear();
     void apply(const FunctorNode&,
 	       TraversalType = TraversalType::DFS_PREFIX) const;
@@ -82,11 +82,7 @@ namespace Tree
     void copyTree(const Node *);
     void copyTree(Node *, const Node *);
     bool compareTree(const Node *, const Node *) const;
-
-  protected :
     std::size_t height(const Node *) const;
-
-  private :
     void insert(Node *, const T&);
     void insert(Node *, T&&);
     Node *find(Node *, const T&) const;
@@ -131,13 +127,12 @@ namespace Tree
   T& BinarySearchTree<T>::Node::getValue() { return _value; }
 
   template <typename T>
-  void
-  BinarySearchTree<T>::Node::setValue(const T& value) { this->_value = value; }
+  void BinarySearchTree<T>::Node::setValue(const T& value) { _value = value; }
 
   template <typename T>
-  void  BinarySearchTree<T>::Node::setValue(T&& value)
+  void BinarySearchTree<T>::Node::setValue(T&& value)
   {
-    this->_value = std::move(value);
+    _value = std::move(value);
   }
   
   template <typename T>
