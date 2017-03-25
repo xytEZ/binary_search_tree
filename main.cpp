@@ -150,7 +150,7 @@ int main()
 
   std::cout << "Size : " << tree.size() << std::endl;
   std::cout << "Height : " << tree.height() << std::endl;
-  std::cout << "width : " << tree.width() << std::endl;
+  std::cout << "Width : " << tree.width() << std::endl;
 
   std::cout << std::endl;
 
@@ -171,11 +171,22 @@ int main()
   else
     std::cout << "key = 99 is not found" << std::endl;
     std::cout << std::endl;
+
+  std::cout << "( ( ( ( Erase 99, 17, 10 ) ) ) )" << std::endl;
+  tree.erase(99);
+  tree.erase(17);
+  tree.erase(10);
+
+  std::cout << "Size : " << tree.size() << std::endl;
+  std::cout << "Height : " << tree.height() << std::endl;
+  std::cout << "Width : " << tree.width() << std::endl;
+
+  std::cout << std::endl;
   
-  std::cout << "( ( ( ( Clear tree2, tree3 ) ) ) )" << std::endl;
+    
+  std::cout << "( ( ( ( Clear tree2 ) ) ) )" << std::endl;
 
   tree2.clear();
-  tree3.clear();
 
   std::cout << "tree2 size, height, width : "
 	    << tree2.size()
@@ -183,13 +194,6 @@ int main()
 	    << tree2.height()
 	    << ", "
 	    << tree2.width()
-	    << std::endl;
-  std::cout << "tree3 size, height, width : "
-	    << tree3.size()
-	    << ", "
-	    << tree3.height()
-	    << ", "
-	    << tree3.width()
 	    << std::endl;
   return 1;
 }

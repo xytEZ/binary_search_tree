@@ -83,8 +83,8 @@ namespace Tree
     void copyTree(Node *, const Node *);
     bool compareTree(const Node *, const Node *) const;
     std::size_t height(const Node *) const;
-    void insert(Node *, const T&);
-    void insert(Node *, T&&);
+    bool insert(Node *, const T&);
+    bool insert(Node *, T&&);
     Node *find(Node *, const T&) const;
     Node *erase(Node *, const T&);
     Node *erase(Node *);
@@ -208,10 +208,7 @@ namespace Tree
   std::size_t BinarySearchTree<T>::size() const { return _size; }
 
   template <typename T>
-  std::size_t BinarySearchTree<T>::height() const
-  {
-    return height(_root);
-  }
+  std::size_t BinarySearchTree<T>::height() const { return height(_root); }
 
   template <typename T>
   std::size_t BinarySearchTree<T>::width() const
@@ -247,26 +244,28 @@ namespace Tree
   
   template <typename T>
   void BinarySearchTree<T>::insert(const T& value)
-  {    
+  {
+    bool isInserted = true;
+    
     if (_root)
-      insert(_root, value);
+      isInserted = insert(_root, value);
     else
-      {
-	_root = new Node(value);
-	++_size;
-      }
+      _root = new Node(value);
+    if (isInserted)
+      ++_size;
   }
 
   template <typename T>
   void BinarySearchTree<T>::insert(T&& value)
   {
+    bool isInserted = true;
+    
     if (_root)
-      insert(_root, std::forward<T>(value));
+      isInserted = insert(_root, std::forward<T>(value));
     else
-      {
-	_root = new Node(std::forward<T>(value));
-	++_size;
-      }
+      _root = new Node(std::forward<T>(value));
+    if (isInserted)
+      ++_size;
   }
   
   template <typename T>
@@ -279,9 +278,7 @@ namespace Tree
   template <typename T>
   void BinarySearchTree<T>::erase(const T& value)
   {
-    erase(_root, value);
-    if (_size == 0)
-      _root = nullptr;
+    _root = erase(_root, value);
   }
 
   template <typename T>
@@ -363,7 +360,7 @@ namespace Tree
   }
 
   template <typename T>
-  void BinarySearchTree<T>::insert(Node *current, const T& value)
+  bool BinarySearchTree<T>::insert(Node *current, const T& value)
   {
     if (current->getValue() > value)
       {
@@ -380,12 +377,12 @@ namespace Tree
 	  current->setRight(new Node(value));
       }
     else
-      return;
-    ++_size;
+      return false;
+    return true;
   }
 
   template <typename T>
-  void BinarySearchTree<T>::insert(Node *current, T&& value)
+  bool BinarySearchTree<T>::insert(Node *current, T&& value)
   {
     if (current->getValue() > value)
       {
@@ -402,8 +399,8 @@ namespace Tree
 	  current->setRight(new Node(std::forward<T>(value)));
       }
     else
-      return;
-    ++_size;
+      return false;
+    return true;
   }
 
   template <typename T>
